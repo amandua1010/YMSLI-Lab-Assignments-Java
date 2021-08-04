@@ -18,8 +18,7 @@ public class ReadWriteCharFormat {
 		File demoFile = new File(demoFilePath);
 		
 		// Writing in file
-		try (BufferedReader readText = new BufferedReader(new InputStreamReader(System.in));
-				BufferedWriter writer = new BufferedWriter( new FileWriter(demoFile)) ) {
+		try ( BufferedReader readText = new BufferedReader(new InputStreamReader(System.in)); BufferedWriter writer = new BufferedWriter( new FileWriter(demoFile)) ) {
 			
 			System.out.println("Input the text for the file: ");
 			String input = readText.readLine();
@@ -40,9 +39,11 @@ public class ReadWriteCharFormat {
 		System.out.println("Now reading from the Demo File: ");
 		try (BufferedReader fileText = new BufferedReader(new FileReader(demoFile));) {
 			
-			String text;
-			while ((text = fileText.readLine()) != null) {
+			String text = fileText.readLine();
+			
+			while (text != null) {
 				System.out.println(text);
+				text = fileText.readLine();
 			}
 			
 		} 

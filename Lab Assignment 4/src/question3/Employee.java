@@ -21,7 +21,7 @@ public class Employee implements Serializable {
 	private String id;
 	private String name;
 	private Address empAddress;
-	static double salary = 30000;
+	private double salary = 30000;
 
 	public Employee(String id, String name, Address empAddress) {
 		
