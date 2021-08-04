@@ -18,9 +18,9 @@ public class WordFrequency {
 			String fileStoryPath = "C:\\Users\\ve00ym263\\Documents\\workspace-spring-tool-suite-4-4.4.2.RELEASE\\Lab Assignment 6\\src\\question2\\file story.txt";
 			BufferedReader text = new BufferedReader(new FileReader(fileStoryPath));
 			
-			String temp = null;
+			String temp = text.readLine();
 			
-			while( (temp = text.readLine()) != null ) {
+			while(temp != null) {
 				
 				String wordsArray[] = temp.split(" ");
 				
@@ -36,6 +36,7 @@ public class WordFrequency {
 					
 				}
 				
+				temp = text.readLine();
 			}
 			
 			text.close();
