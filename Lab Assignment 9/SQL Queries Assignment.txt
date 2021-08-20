@@ -1,0 +1,314 @@
+// Creating Table Sailors
+
+create table sailors(
+	sid int not null, 
+	sname varchar(50), 
+	rating int, 
+	age double not null, 
+	primary key(sid)
+);
+
+// Inserting data into Table Sailors
+
+insert into sailors values(22,"Dustin",7,45.0),
+	(29,"Brutus",1,33.0),
+      	(31,"Lubber",9,55.0),
+	(32,"Andy",8,25.0),
+      	(58,"Rusty",10,35);
+
+
+select * from sailors;
++-----+--------+--------+-----+
+| sid | sname  | rating | age |
++-----+--------+--------+-----+
+|  22 | Dustin |      7 |  45 |
+|  29 | Brutus |      1 |  33 |
+|  31 | Lubber |      9 |  55 |
+|  32 | Andy   |      8 |  25 |
+|  58 | Rusty  |     10 |  35 |
++-----+--------+--------+-----+
+
+
+// Creating Table Boats
+
+create table boats(
+	bid int not null, 
+	bname varchar(50), 
+	color varchar(20), 
+	primary key(bid)
+);
+
+// Inserting data into Table Boats
+
+insert into boats values(101,"Interlake","Blue"),
+	(102,"Interlake","Red"),
+       	(103,"Clipper","Green"),
+	(104,"Marine","Red");
+
+select * from boats;
++-----+-----------+-------+
+| bid | bname     | color |
++-----+-----------+-------+
+| 101 | Interlake | Blue  |
+| 102 | Interlake | Red   |
+| 103 | Clipper   | Green |
+| 104 | Marine    | Red   |
++-----+-----------+-------+
+
+
+// Creating Table Reserves
+
+create table reserves(
+	sid int not null, 
+	bid int not null, 
+	day date not null, 
+	primary key(sid, bid), 
+	foreign key(sid) references sailors(sid), 
+	foreign key(bid) references boats(bid)
+);
+
+// Inserting data into Table Reserves
+
+insert into reserves values(22,101,"2004-01-01"),
+	(22,102,"2004-01-01"),
+	(22,103,"2004-02-01"),
+      	(31,103,"2005-05-05"),
+	(32,104,"2005-04-07");
+
+select * from reserves;
++-----+-----+------------+
+| sid | bid | day        |
++-----+-----+------------+
+|  22 | 101 | 2004-01-01 |
+|  22 | 102 | 2004-01-01 |
+|  22 | 103 | 2004-02-01 |
+|  31 | 103 | 2005-05-05 |
+|  32 | 104 | 2005-04-07 |
++-----+-----+------------+
+
+
+
+// Questions
+
+------------------------------------------------------------------------------------------------
+
+
+
+Question 1.
+
+select sname from sailors where sid in 
+	(select sid from reserves where bid in 
+	(select bid from boats where color="Red"));
+
++--------+
+| sname  |
++--------+
+| Dustin |
+| Andy   |
++--------+
+
+
+
+Question 2.
+
+select distinct(sname) from sailors s, reserves r where s.sid = r.sid;
++--------+
+| sname  |
++--------+
+| Dustin |
+| Lubber |
+| Andy   |
++--------+
+
+
+
+Question 4.
+
+select sailors.age from sailors where sailors.sname like 'B%___%B';
+
+
+
+Question 5.
+
+select * from sailors, boats, reserves
+   	where sailors.sid = reserves.sid and boats.bid = reserves.bid and boats.color="red"   	INTERSECT
+   	select * from sailors,boats,reserves
+   	where sailors.sid = reserves.sid and boats.bid=reserves.bid and boats.color="green";
+
+(mysql doesn't support INTERSECT)
+
+
+
+Question 6.
+
+select * from sailors,boats,reserves
+   	where sailors.sid=reserves.sid and boats.bid=reserves.bid and boats.color="red"
+   	EXCEPT
+   	select * from sailors, boats, reserves
+   	where sailors.sid=reserves.sid and boats.bid=reserves.bid and boats.color="green";
+
+(mysql doesn't support EXCEPT)
+
+
+
+Question 7.
+
+select * from sailors where rating=(select MAX(rating) from sailors);
++-----+-------+--------+-----+
+| sid | sname | rating | age |
++-----+-------+--------+-----+
+|  58 | Rusty |     10 |  35 |
++-----+-------+--------+-----+
+
+
+
+Question 8.
+
+select s1.sname from sailors s1 where age=(select MAX(age) from sailors);
++--------+
+| sname  |
++--------+
+| Lubber |
++--------+
+
+
+
+Question 9.
+
+select count(distinct(sname)) as distinct_sname from sailors;
++-----------------------+
+|     distinct_sname    |
++-----------------------+
+|                     5 |
++-----------------------+
+
+
+
+Question 10.
+
+select sname from sailors where age>=18;
+
++--------+
+| sname  |
++--------+
+| Dustin |
+| Brutus |
+| Lubber |
+| Andy   |
+| Rusty  |
++--------+
+
+
+
+Question 11.
+
+select rating from sailors group by rating having count(sid)>1;
+
+Empty set (0.00 sec)
+
+
+
+Question 12.
+
+select sid from sailors where sid in 
+	(select sid from reserves group by sid having count(bid)=1);
+
++-----+
+| Sid |
++-----+
+|  31 |
+|  32 |
++-----+
+
+
+
+Question 13.
+
+select * from sailors where sid not in (select sid from reserves);
+
++-----+--------+--------+------+
+| sid | sname  | rating | age  |
++-----+--------+--------+------+
+|  29 | Brutus |      1 |   33 |
+|  58 | Rusty  |     10 |   35 |
++-----+--------+--------+------+
+
+
+
+Question 14.
+
+select sid from reserves group by reserves.sid having count(*)>=(select count(distinct(bid)) from boats);
+Empty set (0.00 sec)
+
+
+
+Question 15.
+
+select * from sailors s1 where s1.age > (select age from sailors s2 where s2.sname="Dustin");
++-----+--------+--------+-----+
+| sid | sname  | rating | age |
++-----+--------+--------+-----+
+|  31 | Lubber |      9 |  55 |
++-----+--------+--------+-----+
+
+
+
+Question 16.
+
+select * from sailors order by rating desc LIMIT 1;
+
++-----+-------+--------+------+
+| sid | sname | rating | age  |
++-----+-------+--------+------+
+|  58 | Rusty |     10 |   35 |
++-----+-------+--------+------+
+
+
+
+Question 17.
+
+select * from sailors order by rating desc LIMIT 2, 1;
+
++-----+-------+--------+------+
+| sid | sname | rating | age  |
++-----+-------+--------+------+
+|  32 | Andy  |      8 |   25 |
++-----+-------+--------+------+
+
+
+
+Question 20.
+
+create table customer(
+	CustID int not null primary key auto_increment,
+	Name varchar(100) not null,
+	ReferredBy int
+);
+
+insert into customer (Name, ReferredBy)
+values("Neeta Sayam"), ("Dolly Dilly", 1), ("Meena Kimi", 2);
+
+
+
+Question 21.
+
+select Name from customer where CustID<>ReferredBy;
+
++-------------+
+| Name        |
++-------------+
+| Dolly Dilly |
+| Meena Kimi  |
++-------------+
+
+
+
+Question 22.
+
+select Name from customer where CustID in (select ReferredBy from customer where CustID<>ReferredBy);
++-------------+
+| Name        |
++-------------+
+| Neeta Sayam |
+| Dolly Dilly |
++-------------+
